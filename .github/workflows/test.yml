@@ -5,9 +5,7 @@ env:
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches:
-  #     - main
+
 
 jobs:
   tests:
@@ -15,7 +13,7 @@ jobs:
     runs-on: macos-14
     timeout-minutes: 20
     steps:
-     - name: Checkout Code
+    - name: Checkout Code
       uses: actions/checkout@v4
       with:
         fetch-depth: 2 # NOTE: this fetches the HEAD commit of the PR
