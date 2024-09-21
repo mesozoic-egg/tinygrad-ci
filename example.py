@@ -8,7 +8,6 @@ import cdll
 def main():
   device = cdll.metal.MTLCreateSystemDefaultDevice()
   commandQueue = cdll.send_message(device, "newCommandQueueWithMaxCommandBufferCount:", 1024)
-  return
 
   src = """
   #include <metal_stdlib>
@@ -66,21 +65,6 @@ def main():
   pipelineState = cdll.send_message(device, "newComputePipelineStateWithDescriptor:options:reflection:error:", pipelineDescriptor, 0, None, None)
   cdll.send_message(encoder, "setComputePipelineState:", pipelineState)
 
-  icb_descriptor = cdll.send_message(cdll.libobjc.objc_getClass(b"MTLIndirectCommandBufferDescriptor"), "new")
-  cdll.send_message(icb_descriptor, "setCommandTypes:", 32)
-  cdll.send_message(icb_descriptor, "setInheritBuffers:", False)
-  cdll.send_message(icb_descriptor, "setInheritPipelineState:", False)
-  cdll.send_message(icb_descriptor, "setMaxKernelBufferBindCount:", 31)
-
-  icb = cdll.send_message(device, "newIndirectCommandBufferWithDescriptor:maxCommandCount:options:", icb_descriptor, 1, 0)
-
-  icbComputeCommand = cdll.send_message(icb, "indirectComputeCommandAtIndex:", 0)
-  cdll.send_message(icbComputeCommand, "setComputePipelineState:", pipelineState)
-  cdll.send_message(icbComputeCommand, "setKernelBuffer:offset:atIndex:", buf0, 0, 0)
-  cdll.send_message(icbComputeCommand, "setKernelBuffer:offset:atIndex:", buf1, 0, 1)
-  cdll.send_message(icbComputeCommand, "setKernelBuffer:offset:atIndex:", buf2, 0, 2)
-  cdll.send_message(icbComputeCommand, "concurrentDispatchThreadgroups:threadsPerThreadgroup:", numThreadgroups, numthreads)
-  cdll.send_message(icbComputeCommand, "setBarrier")
 
   cdll.send_message(encoder, "setBuffer:offset:atIndex:", buf0, 0, 0)
   cdll.send_message(encoder, "setBuffer:offset:atIndex:", buf1, 0, 1)
@@ -90,23 +74,6 @@ def main():
   cdll.send_message(commandBuffer, "commit")
   cdll.send_message(commandBuffer, "waitUntilCompleted")
 
-
-  print(np.frombuffer(buf_memoryview_0, dtype=np.int32))
-
-  buf_memoryview_1[:] = np.array([11, 12, 13, 14], dtype=np.int32).data.cast("B")
-  buf_memoryview_2[:] = np.array([11, 12, 13, 14], dtype=np.int32).data.cast("B")
-
-  commandBuffer2 = cdll.send_message(commandQueue, "commandBuffer")
-  encoder2 = cdll.send_message(commandBuffer2, "computeCommandEncoder")
-
-  all_resources = [buf0, buf1, buf2]
-  all_resources_ptr = cdll.to_ns_array(all_resources)
-  cdll.send_message(encoder2, "useResources:count:usage:", all_resources_ptr, 3, 3)
-  cdll.send_message(encoder2, "setComputePipelineState:", pipelineState)
-  cdll.send_message(encoder2, "executeCommandsInBuffer:withRange:", icb, cdll.int_tuple_to_struct((0,1)))
-  cdll.send_message(encoder2, "endEncoding")
-  cdll.send_message(commandBuffer2, "commit")
-  cdll.send_message(commandBuffer2, "waitUntilCompleted")
 
   print(np.frombuffer(buf_memoryview_0, dtype=np.int32))
 
