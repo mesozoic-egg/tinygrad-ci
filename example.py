@@ -74,7 +74,8 @@ def main():
   cdll.send_message(commandBuffer, "commit")
   cdll.send_message(commandBuffer, "waitUntilCompleted")
 
-
+  print(np.frombuffer(buf_memoryview_1, dtype=np.int32))
+  print(np.frombuffer(buf_memoryview_2, dtype=np.int32))
   print(np.frombuffer(buf_memoryview_0, dtype=np.int32))
 
 

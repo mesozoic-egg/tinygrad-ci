@@ -2,7 +2,7 @@
  * To compile objective-c on the command line:
  *
  * gcc -framework Foundation objc-gcc.m
- * clang -framework CoreGraphics -framework Foundation -framework Metal example1.m -o example1 && ./example1
+ * clang -framework CoreGraphics -framework Foundation -framework Metal icb2.m -o icb2 && ./icb2
  *
  * You may have to link with -lobjc or other libs,
  * as required.
@@ -19,43 +19,79 @@ int main(int argc, char** argv)
         NSError* compileError;
         MTLCompileOptions* compileOptions = [MTLCompileOptions new];
         id<MTLLibrary> library = [device newLibraryWithSource:
-        @"#include <metal_stdlib>\n"
-        "using namespace metal;\n"
-        "kernel void add(const device float2 *in [[ buffer(0) ]],\n"
-        "                device float  *out [[ buffer(1) ]],\n"
-        "                uint id [[ thread_position_in_grid ]]) {\n"
-        "out[id] = in[id].x + in[id].y;\n"
-        "}\n"
+@"#include <metal_stdlib>\n"
+"using namespace metal;\n"
+"kernel void E_4n1(device int* data0, const device int* data1, const device int* data2, uint3 gid [[threadgroup_position_in_grid]], uint3 lid [[thread_position_in_threadgroup]]) {\n"
+"  int val0 = *(data1+0);\n"
+"  int val1 = *(data1+1);\n"
+"  int val2 = *(data1+2);\n"
+"  int val3 = *(data1+3);\n"
+"  int val4 = *(data2+0);\n"
+"  int val5 = *(data2+1);\n"
+"  int val6 = *(data2+2);\n"
+"  int val7 = *(data2+3);\n"
+"  *(data0+0) = (val0+val4);\n"
+"  *(data0+1) = (val1+val5);\n"
+"  *(data0+2) = (val2+val6);\n"
+"  *(data0+3) = (val3+val7);\n"
+"}\n"
          options: compileOptions error: nil];
-        id<MTLFunction> kernelFunction = [library newFunctionWithName:@"add"];
+        id<MTLFunction> kernelFunction = [library newFunctionWithName:@"E_4n1"];
         //----------------------------------------------------------------------
         // pipeline
         NSError *error = NULL;
-        [commandQueue commandBuffer];
-        id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
-        id<MTLComputeCommandEncoder> encoder = [commandBuffer computeCommandEncoder];
-        [encoder setComputePipelineState:[device newComputePipelineStateWithFunction:kernelFunction error:&error]];
-        //----------------------------------------------------------------------
-        // Set Data
-        float input[] = {1,2};
-        NSInteger dataSize = sizeof(input);
-        
-        [encoder setBuffer:[device newBufferWithBytes:input length:dataSize options:0]
-                    offset:0
-                   atIndex:0];
-        
-        id<MTLBuffer> outputBuffer = [device newBufferWithLength:sizeof(float) options:0];
-        [encoder setBuffer:outputBuffer offset:0 atIndex:1];
-        //----------------------------------------------------------------------
-        // Run Kernel
+        int input1[] = {10,20,30,40};
+        int input2[] = {10,20,30,40};
+        NSInteger dataSize = sizeof(input1);
         MTLSize numThreadgroups = {1,1,1};
         MTLSize numgroups = {1,1,1};
+        
+        id<MTLBuffer> buf1 = [device newBufferWithLength:4*sizeof(int) options:1];
+
+        id<MTLBuffer> buf2 = [device newBufferWithLength:4*sizeof(int) options:1];
+
+        int *input1_contents = [buf1 contents];
+        int *input2_contents = [buf2 contents];
+        for (int i = 0; i < 4; i++) {
+            input1_contents[i] = input1[i];
+            input2_contents[i] = input2[i];
+        }
+
+        id<MTLBuffer> outputBuffer = [device newBufferWithLength:4*sizeof(int) options:1];
+
+        id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
+        id<MTLComputeCommandEncoder> encoder = [commandBuffer computeCommandEncoder];
+
+
+        MTLComputePipelineDescriptor *pipelineDescriptor = [[MTLComputePipelineDescriptor alloc] init];
+        pipelineDescriptor.computeFunction = kernelFunction;
+        pipelineDescriptor.supportIndirectCommandBuffers = TRUE;
+
+        id<MTLComputePipelineState> pipelineState = [device newComputePipelineStateWithDescriptor:pipelineDescriptor 
+            options:0 reflection:nil error:&error];
+        if (!pipelineState) {
+            NSLog(@"Failed to create pipeline state: %@", error);
+            return 1;
+        }
+        [encoder setComputePipelineState:pipelineState];
+
+        //----------------------------------------------------------------------
+        // Set Data
+
+        [encoder setBuffer:outputBuffer offset:0 atIndex:0];
+        [encoder setBuffer:buf1 offset:0 atIndex:1];
+        [encoder setBuffer:buf2 offset:0 atIndex:2];
+        //----------------------------------------------------------------------
+        // Run Kernel
+
         [encoder dispatchThreadgroups:numThreadgroups threadsPerThreadgroup:numgroups];
         [encoder endEncoding];
         [commandBuffer commit];
         [commandBuffer waitUntilCompleted];
         //----------------------------------------------------------------------
         // Results
-        float *output = [outputBuffer contents];
-        printf("result = %f\n", output[0]);
+        int *output = [outputBuffer contents];
+        for (int i = 0; i < 4; i++) {
+            printf("output[%d] = %d\n", i, output[i]);
+        }
 }
