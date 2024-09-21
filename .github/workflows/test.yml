@@ -34,8 +34,8 @@ jobs:
       with:
         path: ~/Library/Caches/tinygrad/downloads/
         key: downloads-cache-metal-only-${{ env.DOWNLOAD_CACHE_VERSION }}
-    # - name: Install Dependencies
-    #   run: pip install --user -e '.[testing]' --extra-index-url https://download.pytorch.org/whl/cpu
+    - name: Install Dependencies
+      run: pip install numpy
     - name: Check Device.DEFAULT (METAL) and print some source
       run: | 
         source run.sh

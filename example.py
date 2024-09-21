@@ -7,8 +7,8 @@ import cdll
 
 def main():
   device = cdll.metal.MTLCreateSystemDefaultDevice()
-  return
   commandQueue = cdll.send_message(device, "newCommandQueueWithMaxCommandBufferCount:", 1024)
+  return
 
   src = """
   #include <metal_stdlib>
