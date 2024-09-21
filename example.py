@@ -36,10 +36,7 @@ def main():
           )
   cdll.send_message(options, "setFastMathEnabled:", False)
   library = cdll.send_message(device, "newLibraryWithSource:options:error:", cdll.to_ns_str(src), options, None)
-  # library_contents_ptr = cdll.send_message(library, "libraryDataContents")
-  # library_contents_bytes_ptr = cdll.send_message(library_contents_ptr, "bytes")
-  # library_length = cast(int, cdll.send_message(library_contents_ptr, "length", restype=ctypes.c_ulong))
-  # library_bytes = ctypes.string_at(library_contents_bytes_ptr, library_length)
+
   kernelFunction = cdll.send_message(library, "newFunctionWithName:", cdll.to_ns_str("E_4n1"))
 
   buf_ptr_0 = (ctypes.c_char * 16)()

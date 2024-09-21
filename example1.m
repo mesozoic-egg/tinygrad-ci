@@ -2,7 +2,7 @@
  * To compile objective-c on the command line:
  *
  * gcc -framework Foundation objc-gcc.m
- * clang -framework CoreGraphics -framework Foundation -framework Metal icb2.m -o icb2 && ./icb2
+ * clang -framework CoreGraphics -framework Foundation -framework Metal example1.m -o example1 && ./example1
  *
  * You may have to link with -lobjc or other libs,
  * as required.
@@ -46,17 +46,17 @@ int main(int argc, char** argv)
         MTLSize numThreadgroups = {1,1,1};
         MTLSize numgroups = {1,1,1};
         
-        id<MTLBuffer> buf1 = [device newBufferWithLength:4*sizeof(int) options:1];
+        // id<MTLBuffer> buf1 = [device newBufferWithLength:4*sizeof(int) options:1];
+        NSMutableData *input1Data = [NSMutableData dataWithBytes:input1 length:4 * sizeof(int)];
+        id<MTLBuffer> buf1 = [device newBufferWithBytes:[input1Data bytes]
+                                         length:[input1Data length]
+                                        options:0];
+        NSMutableData *input2Data = [NSMutableData dataWithBytes:input2 length:4 * sizeof(int)];
+        id<MTLBuffer> buf2 = [device newBufferWithBytes:[input2Data bytes]
+                                         length:[input2Data length]
+                                        options:0];
 
-        id<MTLBuffer> buf2 = [device newBufferWithLength:4*sizeof(int) options:1];
-
-        int *input1_contents = [buf1 contents];
-        int *input2_contents = [buf2 contents];
-        for (int i = 0; i < 4; i++) {
-            input1_contents[i] = input1[i];
-            input2_contents[i] = input2[i];
-        }
-
+      
         id<MTLBuffer> outputBuffer = [device newBufferWithLength:4*sizeof(int) options:1];
 
         id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
