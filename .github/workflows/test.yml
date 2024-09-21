@@ -35,7 +35,7 @@ jobs:
     #   run: pip install --user -e '.[testing]' --extra-index-url https://download.pytorch.org/whl/cpu
     - name: Check Device.DEFAULT (METAL) and print some source
       run: | 
-        echo 'hello'
+        source run.sh
     - name: Setup upterm session
       uses: mxschmitt/action-tmate@v3
       with:
