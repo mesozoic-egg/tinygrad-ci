@@ -53,11 +53,23 @@ def main():
     buf_ptr_0,
     4*4
   )
-  print("buf0_ns_data", buf0_ns_data, buf0_ns_data.value)
 
-  buf0 = cdll.send_message(device, "newBufferWithBytesNoCopy:length:options:deallocator:", buf_ptr_0, 4*4, 0, None)
-  buf1 = cdll.send_message(device, "newBufferWithBytesNoCopy:length:options:deallocator:", buf_ptr_1, 4*4, 0, None)
-  buf2 = cdll.send_message(device, "newBufferWithBytesNoCopy:length:options:deallocator:", buf_ptr_2, 4*4, 0, None)
+  buf1_ns_data = cdll.send_message(
+    cdll.libobjc.objc_getClass(b"NSMutableData"),
+    "dataWithBytes:length:",
+    buf_ptr_1,
+    4*4
+  )
+  buf2_ns_data = cdll.send_message(
+    cdll.libobjc.objc_getClass(b"NSMutableData"),
+    "dataWithBytes:length:",
+    buf_ptr_2,
+    4*4
+  )
+
+  buf0 = cdll.send_message(device, "newBufferWithBytesNoCopy:length:options:deallocator:", buf0_ns_data, 4*4, 0, None)
+  buf1 = cdll.send_message(device, "newBufferWithBytesNoCopy:length:options:deallocator:", buf1_ns_data, 4*4, 0, None)
+  buf2 = cdll.send_message(device, "newBufferWithBytesNoCopy:length:options:deallocator:", buf2_ns_data, 4*4, 0, None)
 
   buf_memoryview_1[:] = np.array([1,2,3,4], dtype=np.int32).data.cast("B")
   buf_memoryview_2[:] = np.array([1,2,3,4], dtype=np.int32).data.cast("B")
