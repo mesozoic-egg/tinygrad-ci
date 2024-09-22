@@ -41,7 +41,6 @@ jobs:
         git clone https://github.com/mesozoic-egg/tinygrad.git --branch metal-cdll
         cd tinygrad
         pip install -e .
-        python time_linearizer.py
     - name: Setup upterm session
       uses: mxschmitt/action-tmate@v3
       with:
