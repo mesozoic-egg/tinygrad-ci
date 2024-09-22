@@ -14,29 +14,36 @@
 
 int main(int argc, char** argv)
 {
-        id<MTLDevice> device = MTLCreateSystemDefaultDevice();
-     
-        int *input1 = malloc(4 * sizeof(int));
-        input1[0] = 10;
-        input1[1] = 20;
-        input1[2] = 30;
-        input1[3] = 40;
-        NSMutableData *input1Data = [NSMutableData dataWithBytesNoCopy:input1 length:4 * sizeof(int)];
-        int length = [input1Data length];
-        NSLog(@"NSMutable data created");
-        NSLog(@"Length: %d", length);
-        id<MTLBuffer> buf1 = [device newBufferWithBytesNoCopy:input1Data
-                                        length:length
-                                        options:0
-                                        deallocator:nil
-                                        ];
-        NSLog(@"Device buffer created");
-        int length2 = [buf1 length];
-        NSLog(@"Length: %d", length2);
-        int *data = [buf1 contents];
-        NSLog(@"Data pointer obtained");
-        for (int i = 0; i < 4; i++) {
-            printf("data input1[%d] = %d\n", i, input1[i]);
-            printf("data[%d] = %d\n", i, data[i]);
-        }
+    id<MTLDevice> device = MTLCreateSystemDefaultDevice();
+    int *buffer = malloc(4 * sizeof(int));
+    buffer[0] = 10;
+    buffer[1] = 20;
+    buffer[2] = 30;
+    buffer[3] = 40;
+    for (int i = 0; i < 4; i++) {
+        printf("Malloc data[%d] = %d\n", i, buffer[i]);
+    }
+
+    NSMutableData *ns_mutable = [NSMutableData dataWithBytesNoCopy:buffer length:4 * sizeof(int)];
+    int length = [ns_mutable length];
+    int* ns_mutable_ptr = [ns_mutable mutableBytes];
+    printf("NSMutable data created\n");
+    printf("Length: %d\n", length);
+    for (int i = 0; i < 4; i++) {
+        printf("NSMutable data[%d] = %d\n", i, ns_mutable_ptr[i]);
+    }
+
+    id<MTLBuffer> device_buffer = [device newBufferWithBytesNoCopy:ns_mutable_ptr
+                                    length:length
+                                    options:0
+                                    deallocator:nil
+                                    ];
+    printf("Device buffer created\n");
+    int length2 = [device_buffer length];
+    printf("Length: %d\n", length2);
+    int *data = [device_buffer contents];
+    printf("Data pointer obtained\n");
+    for (int i = 0; i < 4; i++) {
+        printf("Device buffer[%d] = %d\n", i, data[i]);
+    }
 }
