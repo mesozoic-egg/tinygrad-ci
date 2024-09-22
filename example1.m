@@ -102,4 +102,8 @@ int main(int argc, char** argv)
         for (int i = 0; i < 4; i++) {
             printf("output[%d] = %d\n", i, output[i]);
         }
+        double start_time = [commandBuffer GPUStartTime];
+        double end_time = [commandBuffer GPUEndTime];
+        double elapsed = end_time - start_time;
+        printf("Start: %f, End: %f, Elapsed: %f\n", start_time, end_time, elapsed);
 }
