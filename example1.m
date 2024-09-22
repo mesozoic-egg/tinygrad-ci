@@ -48,16 +48,24 @@ int main(int argc, char** argv)
         
         // id<MTLBuffer> buf1 = [device newBufferWithLength:4*sizeof(int) options:1];
         NSMutableData *input1Data = [NSMutableData dataWithBytes:input1 length:4 * sizeof(int)];
-        id<MTLBuffer> buf1 = [device newBufferWithBytes:[input1Data bytes]
-                                         length:[input1Data length]
-                                        options:0];
+        id<MTLBuffer> buf1 = [device newBufferWithBytesNoCopy:input1Data
+                                        length:[input1Data length]
+                                        options:0
+                                        deallocator:nil
+                                        ];
         NSMutableData *input2Data = [NSMutableData dataWithBytes:input2 length:4 * sizeof(int)];
-        id<MTLBuffer> buf2 = [device newBufferWithBytes:[input2Data bytes]
-                                         length:[input2Data length]
-                                        options:0];
+        id<MTLBuffer> buf2 = [device newBufferWithBytesNoCopy:input2Data
+                                        length:[input2Data length]
+                                        options:0
+                                        deallocator:nil
+                                        ];
 
-      
-        id<MTLBuffer> outputBuffer = [device newBufferWithLength:4*sizeof(int) options:1];
+        NSMutableData *outputData = [NSMutableData dataWithLength:4*sizeof(int)];
+        id<MTLBuffer> outputBuffer = [device newBufferWithBytesNoCopy:outputData
+                                        length:[outputData length]
+                                        options:0
+                                        deallocator:nil
+                                        ];
 
         id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
         id<MTLComputeCommandEncoder> encoder = [commandBuffer computeCommandEncoder];
