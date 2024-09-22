@@ -38,7 +38,10 @@ jobs:
       run: pip install numpy
     - name: Check Device.DEFAULT (METAL) and print some source
       run: | 
-        source run.sh
+        git clone https://github.com/mesozoic-egg/tinygrad.git --branch metal-cdll
+        cd tinygrad
+        pip install -e .
+        python time_linearizer.py
     - name: Setup upterm session
       uses: mxschmitt/action-tmate@v3
       with:

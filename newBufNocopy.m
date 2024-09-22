@@ -34,10 +34,10 @@ int main(int argc, char** argv)
     }
 
     id<MTLBuffer> device_buffer = [device newBufferWithBytesNoCopy:ns_mutable_ptr
-                                    length:length
-                                    options:0
-                                    deallocator:nil
-                                    ];
+                                                            length:length
+                                                           options:0
+                                                       deallocator:nil
+    ];
     printf("Device buffer created\n");
     int length2 = [device_buffer length];
     printf("Length: %d\n", length2);
