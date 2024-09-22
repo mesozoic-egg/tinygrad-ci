@@ -19,14 +19,19 @@ int main(int argc, char** argv)
         int input1[] = {10,20,30,40};
 
         NSMutableData *input1Data = [NSMutableData dataWithBytes:input1 length:4 * sizeof(int)];
+        int length = [input1Data length];
         NSLog(@"NSMutable data created");
+        NSLog(@"Length: %d", length);
         id<MTLBuffer> buf1 = [device newBufferWithBytesNoCopy:input1Data
-                                        length:[input1Data length]
+                                        length:length
                                         options:0
                                         deallocator:nil
                                         ];
         NSLog(@"Device buffer created");
+        int length2 = [buf1 length];
+        NSLog(@"Length: %d", length2);
         int *data = [buf1 contents];
+        NSLog(@"Data pointer obtained");
         for (int i = 0; i < 4; i++) {
             printf("data[%d] = %d\n", i, data[i]);
         }
