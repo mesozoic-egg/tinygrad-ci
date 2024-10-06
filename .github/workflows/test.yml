@@ -35,14 +35,17 @@ jobs:
         path: ~/Library/Caches/tinygrad/downloads/
         key: downloads-cache-metal-only-${{ env.DOWNLOAD_CACHE_VERSION }}
     - name: Install Dependencies
-      run: pip install numpy
-    - name: Check Device.DEFAULT (METAL) and print some source
-      run: | 
+      run: |
         git clone https://github.com/mesozoic-egg/tinygrad.git --branch ci-test-jit-transfer-metal
         cd tinygrad
         pip install -e '.[testing,testing_tf]' --extra-index-url https://download.pytorch.org/whl/cpu
         pytest test/test_jit.py::TestJit::test_jitted_transfers
-    - name: Setup upterm session
-      uses: mxschmitt/action-tmate@v3
-      with:
-        limit-access-to-actor: true
+
+    - name: Run tests
+      run: | 
+        pytest test/test_jit.py::TestJit::test_jitted_transfers
+
+    # - name: Setup upterm session
+    #   uses: mxschmitt/action-tmate@v3
+    #   with:
+    #     limit-access-to-actor: true
