@@ -38,9 +38,10 @@ jobs:
       run: pip install numpy
     - name: Check Device.DEFAULT (METAL) and print some source
       run: | 
-        git clone https://github.com/mesozoic-egg/tinygrad.git --branch metal-cdll
+        git clone https://github.com/mesozoic-egg/tinygrad.git --branch ci-test-jit-transfer-metal
         cd tinygrad
-        pip install -e .
+        pip install -e '.[testing,testing_tf]' --extra-index-url https://download.pytorch.org/whl/cpu
+        pytest test/test_jit.py::TestJit::test_jitted_transfers
     - name: Setup upterm session
       uses: mxschmitt/action-tmate@v3
       with:
