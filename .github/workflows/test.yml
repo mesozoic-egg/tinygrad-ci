@@ -43,6 +43,7 @@ jobs:
 
     - name: Run tests
       run: | 
+        cd tinygrad
         pytest test/test_jit.py::TestJit::test_jitted_transfers
 
     # - name: Setup upterm session
