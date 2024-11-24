@@ -13,38 +13,39 @@ on:
 jobs:
   tests:
     name: tests
-    runs-on: macos-14
-    timeout-minutes: 20
+    runs-on: ubuntu-22.05
+    timeout-minutes: 40
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 2 # NOTE: this fetches the HEAD commit of the PR
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.11
-    - name: Cache python packages
-      uses: actions/cache@v4
-      with:
-        path: /Users/runner/Library/Python/3.11/lib/python/site-packages
-        key: metal-m1-testing-user3-packages-${{ hashFiles('**/setup.py') }}
-    - name: Cache downloads
-      uses: actions/cache@v4
-      with:
-        path: ~/Library/Caches/tinygrad/downloads/
-        key: downloads-cache-metal-only-${{ env.DOWNLOAD_CACHE_VERSION }}
-    - name: Install Dependencies
-      run: |
-        git clone https://github.com/mesozoic-egg/tinygrad.git --branch ci-test-jit-transfer-metal
-        cd tinygrad
-        pip install -e '.[testing,testing_tf]' --extra-index-url https://download.pytorch.org/whl/cpu
-        pytest test/test_jit.py::TestJit::test_jitted_transfers
-
-    - name: Run tests
-      run: | 
-        cd tinygrad
-        pytest test/test_jit.py::TestJit::test_jitted_transfers
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # NOTE: this fetches the HEAD commit of the PR
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - name: Cache python packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.Python3_ROOT_DIR }}/lib/python3.11/site-packages
+          key: packages
+      - name: Cache downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/tinygrad/downloads/
+          key: downloads-cache
+      - name: Set env
+        run: printf "${{ matrix.backend == 'llvm' && 'LLVM=1' || matrix.backend == 'clang' && 'CLANG=1' || matrix.backend == 'gpu' && 'GPU=1' || matrix.backend == 'PTX' && 'FORWARD_ONLY=1\nJIT=1\nOPT=2\nNV=1\nPTX=1\nMOCKGPU=1' || matrix.backend == 'triton' && 'FORWARD_ONLY=1\nJIT=1\nOPT=2\nNV=1\nMOCKGPU=1\nTRITON=1\nTRITON_PTXAS_PATH=/usr/bin/ptxas' || matrix.backend == 'amd' && 'AMD=1\nMOCKGPU=1\nFORWARD_ONLY=1' || matrix.backend == 'nv' && 'NV=1\nMOCKGPU=1\nFORWARD_ONLY=1' }}" >> $GITHUB_ENV
+        run: |
+          echo 'Acquire::http::Pipeline-Depth "5";' | sudo tee -a /etc/apt/apt.conf.d/99parallel
+          sudo apt update -y || true
+          sudo apt install -y --no-install-recommends git g++ cmake ninja-build llvm-15-dev zlib1g-dev libglew-dev \
+            flex bison libfl-dev libboost-thread-dev libboost-filesystem-dev nvidia-cuda-toolkit-gcc libzstd-dev
+      - name: Install dependencies
+        run: pip install -e '.[testing]' --extra-index-url https://download.pytorch.org/whl/cpu --extra-index-url https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/Triton-Nightly/pypi/simple/
+      - name: Run tests
+        run: PTX=1 pytest test/test_ops.py::TestOps::test_isnan
+      
 
     # - name: Setup upterm session
     #   uses: mxschmitt/action-tmate@v3
