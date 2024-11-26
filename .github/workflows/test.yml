@@ -13,7 +13,7 @@ on:
 jobs:
   tests:
     name: tests
-    runs-on: ubuntu-22.05
+    runs-on: macos-14
     timeout-minutes: 40
     steps:
       - name: Checkout Code
@@ -34,20 +34,7 @@ jobs:
         with:
           path: ~/.cache/tinygrad/downloads/
           key: downloads-cache
-      - name: Install packages (cuda)
-        if: matrix.backend == 'ptx' || matrix.backend == 'triton' || matrix.backend == 'nv'
-        run: |
-          echo 'Acquire::http::Pipeline-Depth "5";' | sudo tee -a /etc/apt/apt.conf.d/99parallel
-          sudo apt update -y || true
-          sudo apt install -y --no-install-recommends git g++ cmake ninja-build llvm-15-dev zlib1g-dev libglew-dev \
-            flex bison libfl-dev libboost-thread-dev libboost-filesystem-dev nvidia-cuda-toolkit-gcc libzstd-dev
-      - name: Install dependencies
-        run: pip install -e '.[testing]' --extra-index-url https://download.pytorch.org/whl/cpu --extra-index-url https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/Triton-Nightly/pypi/simple/
-      - name: Run tests
-        run: PTX=1 pytest test/test_ops.py::TestOps::test_isnan
-      
-
-    # - name: Setup upterm session
-    #   uses: mxschmitt/action-tmate@v3
-    #   with:
-    #     limit-access-to-actor: true
+      - name: Setup upterm session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
