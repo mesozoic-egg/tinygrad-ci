@@ -21,6 +21,11 @@ jobs:
       with:
         repository: 'mesozoic-egg/tinygrad'
         ref: 'master'
+    - name: show files
+      run: |
+        echo "Hello"
+        pwd
+        ls
     - name: Set up Python 3.11
       uses: actions/setup-python@v5
       with:
