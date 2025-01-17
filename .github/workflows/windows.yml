@@ -1,4 +1,4 @@
-name: Ocelot
+name: Windows
 on:
   workflow_dispatch:
 
