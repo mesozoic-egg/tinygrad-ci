@@ -1,0 +1,11 @@
+name: Ocelot
+on:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    name: windows
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
