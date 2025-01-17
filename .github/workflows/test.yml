@@ -16,6 +16,9 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
+      with:
+        repository: 'mesozoic-egg/tinygrad'
+        ref: 'master'
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
